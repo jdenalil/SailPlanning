@@ -21,7 +21,8 @@ pub struct Current {
     pub direction: f64,
 }
 
-pub fn run_astar(goal: PosTime, current: Current, max_speed: f64) -> Option<(Vec<PosTime>, f64)> {
+
+pub fn run_astar(goal: PosTime, current: Current, max_speed: f64) -> Option<(Vec<PosTime>, u32)> {
     // NOTE: Hueristic Approx. MUST be greater than the real cost for this to be optimal
     // I'm not sure that this is strictly the case currently
     astar(
@@ -31,6 +32,7 @@ pub fn run_astar(goal: PosTime, current: Current, max_speed: f64) -> Option<(Vec
         |p: &PosTime| goal_reached(p, &goal),
     )
 }
+
 
 fn find_successors(point: &PosTime, goal: &PosTime, current: Current, max_speed: f64) -> Vec<(PosTime, u32)> {
     // if we're at the end location but haven't hit the goal time, hold at location
@@ -63,8 +65,8 @@ fn find_successors(point: &PosTime, goal: &PosTime, current: Current, max_speed:
         .into_iter()
         .flat_map(|next_point| {
             speeds.iter().filter_map(move |&speed| {
-                calculate_traversal(point, &next_point, current, speed).map(|(power_use, addl_time)| {
-                    (PosTime(next_point.0, next_point.1, point.2 + addl_time), power_use)
+                calculate_traversal_time(point, &next_point, current, speed).map(|(addl_time)| {
+                    (PosTime(next_point.0, next_point.1, point.2 + addl_time), calc_traversal_power(addl_time, speed))
                 })
             })
         }).collect();
@@ -72,13 +74,11 @@ fn find_successors(point: &PosTime, goal: &PosTime, current: Current, max_speed:
 }
 
 
-// wrapper function for calc calculate_traversal_time_power that returns power or 'high power value'
-// we need this becuase astar needs a hueristic estimate for all points
 fn calc_power_hueristic(point: &PosTime, goal: &PosTime, current: Current, boat_water_speed: f64) -> u32 {
-    match calculate_traversal(point, goal, current, boat_water_speed) {
-        Some(power_time) => {
+    match calculate_traversal_time(point, goal, current, boat_water_speed) {
+        Some(traversal_time) => {
             // return traversal power + hold power
-            power_time.0 + calc_hold_power(goal.2, point.2, power_time.1, current.magnitude)
+            calc_traversal_power(traversal_time, boat_water_speed) + calc_hold_power(goal.2, point.2, traversal_time, current.magnitude)
         }
         None => {
             // return high energy value - don't search here!
@@ -87,8 +87,8 @@ fn calc_power_hueristic(point: &PosTime, goal: &PosTime, current: Current, boat_
     }
 }
 
-// return power and time for a given goal and water speed
-fn calculate_traversal(point: &PosTime, goal: &PosTime, current: Current, boat_water_speed: f64) -> Option<(u32, u32)> {
+
+fn calculate_traversal_time(point: &PosTime, goal: &PosTime, current: Current, boat_water_speed: f64) -> Option<u32> {
     // first calculate the distance and direction to the goal point
     let x_distance: i32 = goal.0 - point.0;
     let y_distance: i32 = goal.1 - point.1;
@@ -105,13 +105,13 @@ fn calculate_traversal(point: &PosTime, goal: &PosTime, current: Current, boat_w
     // calculate time to reach goal given dynamics and return based on calculation success / failure
     match FDNewton::new(time_equation).solve(0.5) {
         Ok(time_elapsed) => {
-            let time_elapsed_scaled = time_elapsed * SCALING_FACTOR;
-            if time_elapsed_scaled as u32 + point.2 > goal.2 {
+            let time_elapsed_scaled = (time_elapsed * SCALING_FACTOR) as u32;
+            if time_elapsed_scaled + point.2 > goal.2 {
                 // traversal takes us beyond goal time
                 None
             } else {
                 // calc scaled power and time
-                Some(((time_elapsed_scaled * energy_use(boat_water_speed)) as u32, time_elapsed_scaled as u32))
+                Some(time_elapsed_scaled)
             }
         }
         Err(_error) => {
@@ -126,9 +126,16 @@ fn calc_hold_power(goal_time: u32, point_time: u32, traversal_time: u32, current
     ((goal_time - point_time - traversal_time) as f64 * energy_use(current_speed)) as u32
 }
 
+
+fn calc_traversal_power(traversal_time: u32, traversal_speed: f64) -> u32 {
+    (traversal_time as f64 * energy_use(traversal_speed)) as u32 
+}
+
+
 fn goal_reached(point: &PosTime, goal: &PosTime) -> bool {
     point.0 == goal.0 && point.1 == goal.1 && point.2 == goal.2
 }
+
 
 /* 
 #[cfg(test)]
