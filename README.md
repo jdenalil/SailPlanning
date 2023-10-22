@@ -28,10 +28,6 @@ NOTE: for A* to be optimal, the heuristic must not be greater than the real cost
 #### Traversal Time function
 Both the heuristic and the transition functions leverage the function `calculate_traversal_time` under the hood, which I consider to be the core functionality of this approach. This function takes a current point, a goal point, an ocean current, and a desired boat water speed and calculates the amount of time it will take to traverse between the points using a newton's method solver. This time can be combined with the boat water speed and power map function to calculate the power used over the traversal.
 
-### Why not other planning algorithms?
-1. dijkstra: For any non-trivial planning, dijkstra takes a prohibitive amount of time given that there is an equation solver to calculate the cost between two points. If we ignored ocean current, we would have a closed form solution for traversal time and dijkstra would be viable.
-1. rrt: TODO
-
 ## Future Work
 1. Build a low level planner to smooth the discretized waypoints and account for realistic vehicle dynamics
 1. Build a quick visualization  of the path taken by the aircraft
