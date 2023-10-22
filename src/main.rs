@@ -1,8 +1,8 @@
-mod planning;
 mod dynamics;
+mod planning;
 
-use crate::planning::print_plan;
 use crate::dynamics::exp_energy_use;
+use crate::planning::print_plan;
 
 fn main() {
     // we're given a relative goal point, time of arrival, ocean current, and max_speed

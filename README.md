@@ -33,7 +33,7 @@ Both the heuristic and the transition functions leverage the function `calculate
 1. rrt: TODO
 
 ## Future Work
-1. Build a low level planning to smooth the discretized waypoints and account for realistic vehicle dynamics
+1. Build a low level planner to smooth the discretized waypoints and account for realistic vehicle dynamics
 1. Build a quick visualization  of the path taken by the aircraft
 1. Allow the number of speeds tried to be given as an input by the user instead of embedded in the code
 1. Fix the A* heuristic  function to ensure it is always lower then the actual cost

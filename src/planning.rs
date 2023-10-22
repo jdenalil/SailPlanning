@@ -20,12 +20,23 @@ type EnergyFunction = fn(f64) -> f64;
 
 // LIMITATION: since the a-star algo I'm using can only handle int values, I'm scaling the hueristic, speed, and time to ints so I can pass them around inside the planner
 
-pub fn print_plan(goal_x: i32, goal_y: i32, goal_time: f64, current_magnitude: f64, current_direction_from_north: f64, max_boat_speed: f64, energy_use_fn: EnergyFunction) {
+pub fn print_plan(
+    goal_x: i32,
+    goal_y: i32,
+    goal_time: f64,
+    current_magnitude: f64,
+    current_direction_from_north: f64,
+    max_boat_speed: f64,
+    energy_use_fn: EnergyFunction,
+) {
     let result = run_astar(
         energy_use_fn,
-        PosTime(goal_x, goal_y, (goal_time * SCALING_FACTOR) as u32), 
-        Current { magnitude: current_magnitude, direction: current_direction_from_north }, 
-        max_boat_speed
+        PosTime(goal_x, goal_y, (goal_time * SCALING_FACTOR) as u32),
+        Current {
+            magnitude: current_magnitude,
+            direction: current_direction_from_north,
+        },
+        max_boat_speed,
     );
     match result {
         Some(t) => {
@@ -38,7 +49,12 @@ pub fn print_plan(goal_x: i32, goal_y: i32, goal_time: f64, current_magnitude: f
     }
 }
 
-fn run_astar(energy_use_fn: EnergyFunction, goal: PosTime, current: Current, max_speed: f64) -> Option<(Vec<PosTime>, u32)> {
+fn run_astar(
+    energy_use_fn: EnergyFunction,
+    goal: PosTime,
+    current: Current,
+    max_speed: f64,
+) -> Option<(Vec<PosTime>, u32)> {
     // NOTE: Hueristic Approx. must be greater than the real cost for this to guarantee an optimal solution
     astar(
         &PosTime(0, 0, 0),
@@ -108,7 +124,12 @@ fn calc_power_hueristic(
         Some(traversal_time) => {
             // return traversal power + hold power
             calc_traversal_power(energy_use_fn, traversal_time, boat_water_speed)
-                + calc_hold_power(energy_use_fn, goal.2, point.2 + traversal_time, current.magnitude)
+                + calc_hold_power(
+                    energy_use_fn,
+                    goal.2,
+                    point.2 + traversal_time,
+                    current.magnitude,
+                )
         }
         None => {
             // return a very high power value - don't search here!
@@ -129,6 +150,8 @@ fn calculate_traversal_time(
     let y_distance: i32 = goal.1 - point.1;
     let goal_distance = ((x_distance.pow(2) + y_distance.pow(2)) as f64).sqrt();
     let goal_direction = (x_distance as f64).atan2(y_distance as f64);
+
+    // TODO: We can likely predict when the solver will fail based on geometry, and skip the calculation
 
     // set up equation for time to get to local goal point
     let time_equation = |time_elapsed: f64| {
@@ -167,6 +190,10 @@ fn calc_hold_power(
     ((goal_time - point_time) as f64 * energy_use_fn(current_speed)) as u32
 }
 
-fn calc_traversal_power(energy_use_fn: EnergyFunction, traversal_time: u32, traversal_speed: f64) -> u32 {
+fn calc_traversal_power(
+    energy_use_fn: EnergyFunction,
+    traversal_time: u32,
+    traversal_speed: f64,
+) -> u32 {
     (traversal_time as f64 * energy_use_fn(traversal_speed)) as u32
 }
