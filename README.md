@@ -10,6 +10,9 @@ We would like to arrive at some goal location at some time using the minimum pow
 ## Quickstart
 To run an example planning scenario, just change the values in `main.rs` and run `cargo run`. This will print the results of the planning. To use the planning results, the main entrypoint is the `run_astar` function, which returns a vector of Postion & Time waypoints and a total power use for the path (`Option<(Vec<PosTime>, u32)>`).
 
+### Disclaimer
+This implementation is a work in progress, and does not properly reject invalid inputs or guarantee an optimal solution.
+
 ## Implementation Overview:
 The Solution in this repo uses A* search with modified functions for transition dynamics, heuristic, and success. The goal of the search is to minimize power use. 
 
@@ -39,3 +42,4 @@ Both the heuristic and the transition functions leverage the function `calculate
 1. Becuase of the equation solver in the traversal time estimator, the algorithm could be quite slow for large inputs. Finding a good approximate closed form solution would be helpful.
 1. If it is not possible to get to the goal within the provided time, the search seems to hang. We should make sure the input is valid before searching.
 1. Build out integration tests
+1. Improve rejection of generally invalid inputs, like negative maximum boat speeds
