@@ -3,14 +3,6 @@
 version = 3
 
 [[package]]
-name = "SailPlanning"
-version = "0.1.0"
-dependencies = [
- "eqsolver",
- "pathfinding",
-]
-
-[[package]]
 name = "approx"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -224,6 +216,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f398075ce1e6a179b46f51bd88d0598b92b00d3551f1a2d4ac49e771b56ac354"
 dependencies = [
  "bytemuck",
+]
+
+[[package]]
+name = "sail_planning"
+version = "0.1.0"
+dependencies = [
+ "eqsolver",
+ "pathfinding",
 ]
 
 [[package]]

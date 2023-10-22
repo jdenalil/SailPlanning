@@ -197,3 +197,41 @@ fn calc_traversal_power(
 ) -> u32 {
     (traversal_time as f64 * energy_use_fn(traversal_speed)) as u32
 }
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_calculate_traversal_time_wo_current() {
+        // test that the solver works without current
+        let no_current: Current = Current { magnitude: 0.0, direction: 0.0 };
+        let result1: Option<u32> = calculate_traversal_time(&PosTime(0, 0, 0), &PosTime(2, 0, (3.0 * SCALING_FACTOR) as u32), &no_current, 2.0);
+        assert!(result1.is_some(), "Expected Time, got None");
+        assert_eq!(result1.unwrap(), (1.0*SCALING_FACTOR) as u32);
+        let result2: Option<u32> = calculate_traversal_time(&PosTime(2, 2, 2), &PosTime(2, 4, (5.0 * SCALING_FACTOR) as u32), &no_current, 4.0);
+        assert!(result2.is_some(), "Expected Time, got None");
+        assert_eq!(result2.unwrap(), (0.5*SCALING_FACTOR) as u32);
+        let result3: Option<u32> = calculate_traversal_time(&PosTime(2, 2, 10), &PosTime(1, 1, (12.0 * SCALING_FACTOR) as u32), &no_current, 2.0);
+        assert!(result3.is_some(), "Expected Time, got None");
+        assert_eq!(result3.unwrap(), (0.707*SCALING_FACTOR) as u32);
+    }
+
+    #[test]
+    fn test_calculate_traversal_time_w_current() {
+        // test that the solver works with current
+        let some_current: Current = Current { magnitude: 1.0, direction: 1.57 };
+        let result1: Option<u32> = calculate_traversal_time(&PosTime(0, 0, 0), &PosTime(2, 0, (3.0 * SCALING_FACTOR) as u32), &some_current, 2.0);
+        assert!(result1.is_some(), "Expected Time, got None");
+        assert_eq!(result1.unwrap(), (0.666*SCALING_FACTOR) as u32);
+        let result2: Option<u32> = calculate_traversal_time(&PosTime(2, 2, 2), &PosTime(2, 4, (5.0 * SCALING_FACTOR) as u32), &some_current, 5.0);
+        assert!(result2.is_some(), "Expected Time, got None");
+        assert_eq!(result2.unwrap(), (0.408*SCALING_FACTOR) as u32);
+        
+        // test that the solver fails when the current is too strong
+        let strong_current: Current = Current { magnitude: 3.0, direction: 0.0 };
+        let result3: Option<u32> = calculate_traversal_time(&PosTime(0, 2, 10), &PosTime(0, 0, (12.0 * SCALING_FACTOR) as u32), &strong_current, 2.0);
+        assert!(result3.is_none(), "Expected None, got Time");
+    }
+}

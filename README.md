@@ -39,4 +39,4 @@ Both the heuristic and the transition functions leverage the function `calculate
 1. Fix the A* heuristic function to ensure it is always lower then the actual cost
 1. Becuase of the equation solver in the traversal time estimator, the algorithm could be quite slow for large inputs. Finding a good approximate closed form solution would be helpful.
 1. If it is not possible to get to the goal within the provided time, the search seems to hang. We should make sure the input is valid before searching.
-1. Build out unit and integration tests
+1. Build out integration tests
