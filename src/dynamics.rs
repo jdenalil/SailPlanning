@@ -1,3 +1,5 @@
+#[allow(dead_code)]
+
 pub fn linear_energy_use(boat_water_speed: f64) -> f64 {
     boat_water_speed * 1.2
 }
