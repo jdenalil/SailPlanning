@@ -8,6 +8,7 @@ static MAX_TRAVERSAL_TIME: f64 = 10.0;
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct Pos(pub i32, pub i32);
 
+
 pub fn run_dijkstra(goal: Pos, current_speed: f64, current_direction: f64, constant_water_speed: f64) -> Option<(Vec<Pos>, f64)> {
     let mut result = dijkstra(
         &Pos(0, 0),

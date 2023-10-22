@@ -15,40 +15,21 @@ static NUM_SPEEDS_TO_SEARCH: u32 = 10;
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct PosTime(pub i32, pub i32, pub u32);
 
-pub struct UnscaledPosTime {
-    pub x: i32, 
-    pub y: i32, 
-    pub time: f64,
-}
-
 #[derive(Clone, Copy, Debug)]
 pub struct Current {
     pub magnitude: f64,
     pub direction: f64,
 }
 
-pub fn run_astar(goal: PosTime, current: Current, max_speed: f64) -> Option<(Vec<UnscaledPosTime>, f64)> {
+pub fn run_astar(goal: PosTime, current: Current, max_speed: f64) -> Option<(Vec<PosTime>, f64)> {
     // NOTE: Hueristic Approx. MUST be greater than the real cost for this to be optimal
-    let result: Option<(Vec<PosTime>, u32)> = astar(
+    // I'm not sure that this is strictly the case currently
+    astar(
         &PosTime(0, 0, 0),
         |p: &PosTime| find_successors(p, &goal, current, max_speed),
         |p: &PosTime| calc_power_hueristic(p, &goal, current, max_speed), // Hueristic is energy use at max speed - this will almost always be a pessimistic estimiate
         |p: &PosTime| goal_reached(p, &goal),
-    );
-    match result {
-        Some((pos_time_vec, power_use)) => {
-            let processed_result: Vec<UnscaledPosTime> = pos_time_vec
-                .into_iter()
-                .map(|pos_time| UnscaledPosTime {
-                    x: pos_time.0,
-                    y: pos_time.1,
-                    time: pos_time.2 as f64 / SCALING_FACTOR,
-                })
-                .collect();
-            Some((processed_result, power_use as f64 / SCALING_FACTOR))
-        }
-        None => None,
-    }
+    )
 }
 
 fn find_successors(point: &PosTime, goal: &PosTime, current: Current, max_speed: f64) -> Vec<(PosTime, u32)> {
@@ -74,10 +55,10 @@ fn find_successors(point: &PosTime, goal: &PosTime, current: Current, max_speed:
         PosTime(point.0 - 1, point.1 - 1, goal.2),
     ];
 
-    // Generate N possible speeds in the range [0.0, max_speed]
+    // Generate NUM_SPEEDS_TO_SEARCH possible speeds in the range [0.0, max_speed]
     let speeds: Vec<f64> = (0..=NUM_SPEEDS_TO_SEARCH).map(|i| (i as f64) * max_speed / NUM_SPEEDS_TO_SEARCH as f64).collect();
 
-    // Now, for each point, let's try each speed, filtering for None returns meaning unreachable 
+    // Now, for each point, let's try each speed, filtering unreachable point / speed combos
     let successors: Vec<(PosTime, u32)> = points
         .into_iter()
         .flat_map(|next_point| {
