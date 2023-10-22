@@ -41,7 +41,7 @@ fn find_successors(
         // if so, calculate time remaining and energy needed to sail against current until the goal time
         // Return a single element with goal position, goal time, current speed, and power needed
         return vec![(
-            PosTime(goal.0, goal.1, goal.2),
+            goal.clone(),
             calc_hold_power(goal.2, point.2, 0, current.magnitude),
         )];
     }
@@ -92,8 +92,8 @@ fn calc_power_hueristic(
                 + calc_hold_power(goal.2, point.2, traversal_time, current.magnitude)
         }
         None => {
-            // return high energy value - don't search here!
-            (SCALING_FACTOR * SCALING_FACTOR) as u32
+            // return highest possible power value - don't search here!
+            u32::MAX
         }
     }
 }
