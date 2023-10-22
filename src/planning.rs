@@ -4,22 +4,39 @@ use pathfinding::prelude::astar;
 
 // PosTime struct for nodes
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub struct PosTime(pub i32, pub i32, pub u32);
+struct PosTime(i32, i32, u32);
 
 #[derive(Clone, Copy, Debug)]
-pub struct Current {
-    pub magnitude: f64,
-    pub direction: f64,
+struct Current {
+    magnitude: f64,
+    direction: f64,
 }
 
 // scaling factor used before converting floats to ints
-pub static SCALING_FACTOR: f64 = 1000.0;
+static SCALING_FACTOR: f64 = 1000.0;
 // number of speeds used to discretize speed range
-pub static NUM_SPEEDS_TO_SEARCH: u32 = 10;
+static NUM_SPEEDS_TO_SEARCH: u32 = 10;
 
 // LIMITATION: since the a-star algo I'm using can only handle int values, I'm scaling the hueristic, speed, and time to ints so I can pass them around inside the planner
 
-pub fn run_astar(goal: PosTime, current: Current, max_speed: f64) -> Option<(Vec<PosTime>, u32)> {
+pub fn print_plan(goal_x: i32, goal_y: i32, goal_time: f64, current_magnitude: f64, current_direction_from_north: f64, max_boat_speed: f64) {
+    let result = run_astar(
+        PosTime(goal_x, goal_y, (goal_time * SCALING_FACTOR) as u32), 
+        Current { magnitude: current_magnitude, direction: current_direction_from_north }, 
+        max_boat_speed
+    );
+    match result {
+        Some(t) => {
+            for p in t.0 {
+                println!("x {} y {} time {}", p.0, p.1, p.2 as f64 / SCALING_FACTOR);
+            }
+            println!("found power cost {}", t.1 as f64 / SCALING_FACTOR);
+        }
+        None => {}
+    }
+}
+
+fn run_astar(goal: PosTime, current: Current, max_speed: f64) -> Option<(Vec<PosTime>, u32)> {
     // NOTE: Hueristic Approx. MUST be greater than the real cost for this to be optimal
     astar(
         &PosTime(0, 0, 0),
