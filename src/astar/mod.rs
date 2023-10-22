@@ -1,14 +1,6 @@
-
 use pathfinding::prelude::astar;
 use eqsolver::single_variable::FDNewton;
 use crate::dynamics::energy_use;
-
-// LIMITATION: since the astar algo I'm using can only handle int values, I'm scaling the hueristic, speed, and time to ints so I can pass them around inside the planner
-
-// scaling factor used before converting floats to ints
-pub static SCALING_FACTOR: f64 = 1000.0;
-// number of speeds used to decritize speed range
-static NUM_SPEEDS_TO_SEARCH: u32 = 10;
 
 
 // PosTime struct for nodes
@@ -21,6 +13,12 @@ pub struct Current {
     pub direction: f64,
 }
 
+// scaling factor used before converting floats to ints
+pub static SCALING_FACTOR: f64 = 1000.0;
+// number of speeds used to decritize speed range
+pub static NUM_SPEEDS_TO_SEARCH: u32 = 10;
+
+// LIMITATION: since the astar algo I'm using can only handle int values, I'm scaling the hueristic, speed, and time to ints so I can pass them around inside the planner
 
 pub fn run_astar(goal: PosTime, current: Current, max_speed: f64) -> Option<(Vec<PosTime>, u32)> {
     // NOTE: Hueristic Approx. MUST be greater than the real cost for this to be optimal
@@ -65,7 +63,7 @@ fn find_successors(point: &PosTime, goal: &PosTime, current: Current, max_speed:
         .into_iter()
         .flat_map(|next_point| {
             speeds.iter().filter_map(move |&speed| {
-                calculate_traversal_time(point, &next_point, current, speed).map(|(addl_time)| {
+                calculate_traversal_time(point, &next_point, current, speed).map(|addl_time| {
                     (PosTime(next_point.0, next_point.1, point.2 + addl_time), calc_traversal_power(addl_time, speed))
                 })
             })

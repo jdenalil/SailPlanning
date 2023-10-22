@@ -19,4 +19,4 @@ pub fn energy_use(boat_water_speed: f64) -> f64 {
         // power use: 7.75 to ?
         boat_water_speed * 1.25 + 3.0
     }
-  }
+}

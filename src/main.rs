@@ -1,7 +1,7 @@
-mod astar_variable_speed;
+mod astar;
 mod dynamics;
 
-use crate::astar_variable_speed::{PosTime, Current, run_astar, SCALING_FACTOR};
+use crate::astar::{PosTime, Current, run_astar, SCALING_FACTOR};
 
 fn main() {
   // we're given a relative goal point, time of arrival, ocean current, and max_speed
