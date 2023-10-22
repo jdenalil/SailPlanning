@@ -29,7 +29,7 @@ pub fn run_astar(goal: PosTime, current: Current, max_speed: f64) -> Option<(Vec
         &PosTime(0, 0, 0),
         |p: &PosTime| find_successors(p, &goal, current, max_speed),
         |p: &PosTime| calc_power_hueristic(p, &goal, current, max_speed), // Hueristic is energy use at max speed - this will almost always be a pessimistic estimiate
-        |p: &PosTime| goal_reached(p, &goal),
+        |p: &PosTime| p == &goal,
     )
 }
 
@@ -45,7 +45,7 @@ fn find_successors(point: &PosTime, goal: &PosTime, current: Current, max_speed:
         ];
     }
 
-    // we aren't at the goal yet, let's first generate all possible movements
+    // generate all possible movements
     let points: Vec<PosTime> = vec![
         PosTime(point.0 + 1, point.1, goal.2), 
         PosTime(point.0 - 1, point.1, goal.2), 
@@ -61,7 +61,7 @@ fn find_successors(point: &PosTime, goal: &PosTime, current: Current, max_speed:
     let speeds: Vec<f64> = (0..=NUM_SPEEDS_TO_SEARCH).map(|i| (i as f64) * max_speed / NUM_SPEEDS_TO_SEARCH as f64).collect();
 
     // Now, for each point, let's try each speed, filtering unreachable point / speed combos
-    let successors: Vec<(PosTime, u32)> = points
+    points
         .into_iter()
         .flat_map(|next_point| {
             speeds.iter().filter_map(move |&speed| {
@@ -69,8 +69,7 @@ fn find_successors(point: &PosTime, goal: &PosTime, current: Current, max_speed:
                     (PosTime(next_point.0, next_point.1, point.2 + addl_time), calc_traversal_power(addl_time, speed))
                 })
             })
-        }).collect();
-    successors
+        }).collect()
 }
 
 
@@ -129,11 +128,6 @@ fn calc_hold_power(goal_time: u32, point_time: u32, traversal_time: u32, current
 
 fn calc_traversal_power(traversal_time: u32, traversal_speed: f64) -> u32 {
     (traversal_time as f64 * energy_use(traversal_speed)) as u32 
-}
-
-
-fn goal_reached(point: &PosTime, goal: &PosTime) -> bool {
-    point.0 == goal.0 && point.1 == goal.1 && point.2 == goal.2
 }
 
 

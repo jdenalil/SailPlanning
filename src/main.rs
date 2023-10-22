@@ -3,9 +3,6 @@ mod dynamics;
 
 use crate::astar_variable_speed::{PosTime, Current, run_astar, SCALING_FACTOR};
 
-// TODO: function to visualize the path taken
-// TODO: create a lower level planner that smoothes the waypoints and builds dubins curves
-
 fn main() {
   // we're given a relative goal point, time of arrival, ocean current, and max_speed
   let goal: PosTime = PosTime(15, 20, 10 * SCALING_FACTOR as u32); // goal location is relative to origin
