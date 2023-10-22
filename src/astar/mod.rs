@@ -92,8 +92,9 @@ fn calc_power_hueristic(
                 + calc_hold_power(goal.2, point.2, traversal_time, current.magnitude)
         }
         None => {
-            // return highest possible power value - don't search here!
-            u32::MAX
+            // return a very high power value - don't search here!
+            // we can't return u32::MAX bc we run into addition overflows
+            u16::MAX as u32
         }
     }
 }
