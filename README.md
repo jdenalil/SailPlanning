@@ -7,7 +7,7 @@ path planning for efficient sailing
 We would like to arrive at some goal location at some time using the minimum power, given the following:
 1. Goal relative position and arrival time
 1. Magnitude and direction of ocean current
-1. Power use vs. water speed profile for the craft 
+1. Power use vs. water speed profile for the craft, including a maximum speed
 
 ### Implementation Overview:
 The Solution in this repo uses A* search with modified functions for transition dynamics, hueristic, and success. The goal of the search is to minimize power use. 
@@ -25,21 +25,20 @@ The hueristic use for the search is calculated by adding two components:
 1. The power used by the boat sailing at full speed directly towards the goal location
 2. The power used by holding at the goal location until the goal time 
 
-NOTE: for A* to be optimal, the hueristic must not be greater than the real cost. This is not currently the case. 
+NOTE: for A* to be optimal, the hueristic must not be greater than the real cost. This is not currently the case over all possible energy models.
 
 #### Traversal Time function
 Both the hueristic and he transition functions leverage the function `calculate_traversal_time` under the hood, which I consider to be the core functionality of this approach. This function takes a current point, a goal point, an ocean current, and a desired boat water speed and calculates the amount of time it will take to traverse between the points using a newton's method solver. This time can be combined with the boat water speed and power map function to calculate the power used over the traversal.
 
 
 ### Why not other planning algorithms?
-TODO 
-
+1. dijkstra: For any non-trival planning, dijkstra takes a prohibative amount of time given that there is an equation solver to calculate the cost between two points. If we ignored ocean current, we would have a closed form solution for traversal time and dijkstra would be viable.
+2. rrt: TODO
 
 
 ## Future Work
-1. The algorithm produces a set of discretized waypoints that don't take into account speed or direction changes - a lower level planner should be added to smooth these waypoints to account for vechicle dynamics
+1. Build a low level planning to smooth the discretized waypoints and account for realistic vechicle dynamics
 1. Build a quick vizualization of the path taken by the aircraft
-1. Allow the energy function to be given as an input by the user instead of embedded in the code
 1. Allow the number of speeds tried to be given as an input by the user instead of embedded in the code
-1. Fix the hueristic function to ensure it is always lower then the actual cost
+1. Fix the A* hueristic function to ensure it is always lower then the actual cost
 1. Build out unit and integration tests
