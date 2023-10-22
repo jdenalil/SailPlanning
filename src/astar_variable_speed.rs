@@ -21,6 +21,7 @@ pub struct UnscaledPosTime {
     pub time: f64,
 }
 
+#[derive(Clone, Copy, Debug)]
 pub struct Current {
     pub magnitude: f64,
     pub direction: f64,
