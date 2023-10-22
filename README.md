@@ -21,9 +21,9 @@ There a two cases for generation of possible transition nodes:
 #### Heuristic function
 The heuristic used for the search is calculated by adding two components:
 1. The power used by the boat sailing at full speed directly towards the goal location
-2. The power used by holding at the goal location until the goal time 
+2. The power used by holding at the goal location until the goal time for the remaining time
 
-NOTE: for A* to be optimal, the heuristic must not be greater than the real cost. This is not currently the case over all possible energy models.
+NOTE: for A* to be optimal, the heuristic must not be greater than the real cost. This is not currently the case for most energy models.
 
 #### Traversal Time function
 Both the heuristic and the transition functions leverage the function `calculate_traversal_time` under the hood, which I consider to be the core functionality of this approach. This function takes a current point, a goal point, an ocean current, and a desired boat water speed and calculates the amount of time it will take to traverse between the points using a newton's method solver. This time can be combined with the boat water speed and power map function to calculate the power used over the traversal.
@@ -36,5 +36,7 @@ Both the heuristic and the transition functions leverage the function `calculate
 1. Build a low level planner to smooth the discretized waypoints and account for realistic vehicle dynamics
 1. Build a quick visualization  of the path taken by the aircraft
 1. Allow the number of speeds tried to be given as an input by the user instead of embedded in the code
-1. Fix the A* heuristic  function to ensure it is always lower then the actual cost
+1. Fix the A* heuristic function to ensure it is always lower then the actual cost
+1. Becuase of the equation solver in the traversal time estimator, the algorithm could be quite slow for large inputs. Finding a good approximate closed form solution would be helpful.
+1. If it is not possible to get to the goal within the provided time, the search seems to hang. We should make sure the input is valid before searching.
 1. Build out unit and integration tests
