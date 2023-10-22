@@ -34,12 +34,17 @@ NOTE: for A* to be optimal, the heuristic must not be greater than the real cost
 ### Traversal Time function
 Both the heuristic and the transition functions leverage the function `calculate_traversal_time` under the hood, which I consider to be the core functionality of this approach. This function takes a current point, a goal point, an ocean current, and a desired boat water speed and calculates the amount of time it will take to traverse between the points using a newton's method solver. This time can be combined with the boat water speed and power map function to calculate the power used over the traversal.
 
-## Future Work
-1. Build a low level planner to smooth the discretized waypoints and account for realistic vehicle dynamics
-1. Build a quick visualization  of the path taken by the aircraft
-1. Allow the number of speeds tried to be given as an input by the user instead of embedded in the code
-1. Fix the A* heuristic function to ensure it is always lower then the actual cost
-1. Becuase of the equation solver in the traversal time estimator, the algorithm could be quite slow for large inputs. Finding a good approximate closed form solution would be helpful.
-1. If it is not possible to get to the goal within the provided time, the search seems to hang. We should make sure the input is valid before searching.
-1. Build out integration tests
-1. Improve rejection of generally invalid inputs, like negative maximum boat speeds
+## Current Tech Debt
+1. Allow the number of speeds tried to be given as an input by the user instead of embedded in the code.
+1. Fix the A* heuristic calculation to ensure it is always lower then the actual cost.
+1. Improve rejection of generally invalid inputs like negative maximum boat speeds. For example, if it is not possible to get to the goal within the provided time, the search will hang instead of returning an error message.
+1. Add integration tests.
+
+## Future Features
+1. Build a low level planner to smooth the discretized waypoints and account for realistic vehicle dynamics.
+1. Build a visualization of the path taken by the craft.
+1. Accept Current as map of position -> current instead of a constant magnitude and direction.
+1. Take waves into account during traversal time calculation. This will entail adding a wave height map over time object that the planner can query with position and time values. Since the waves are changing with time, this will add additional non-linearity to the traversal time.
+1. Take into account no-go zones. If these zones can be queried with a position and time, search nodes can easily by filtered out by the planner. 
+
+In summary, having access to a world map with current, wave height, and no-go zones is the logical next step for the planner.
