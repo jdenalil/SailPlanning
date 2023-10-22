@@ -3,12 +3,12 @@ use pathfinding::prelude::astar;
 
 // PosTime struct for nodes
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-struct PosTime(i32, i32, u32);
+pub struct PosTime(pub i32, pub i32, pub u32);
 
 #[derive(Clone, Copy, Debug)]
-struct Current {
-    magnitude: f64,
-    direction: f64,
+pub struct Current {
+    pub magnitude: f64,
+    pub direction: f64,
 }
 
 // scaling factor used before converting floats to ints
@@ -49,7 +49,7 @@ pub fn print_plan(
     }
 }
 
-fn run_astar(
+pub fn run_astar(
     energy_use_fn: EnergyFunction,
     goal: PosTime,
     current: Current,
