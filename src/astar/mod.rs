@@ -24,8 +24,8 @@ pub fn run_astar(goal: PosTime, current: Current, max_speed: f64) -> Option<(Vec
     // I'm not sure that this is strictly the case currently
     astar(
         &PosTime(0, 0, 0),
-        |p: &PosTime| find_successors(p, &goal, current, max_speed),
-        |p: &PosTime| calc_power_hueristic(p, &goal, current, max_speed), // Hueristic is energy use at max speed - this will almost always be a pessimistic estimiate
+        |p: &PosTime| find_successors(p, &goal, &current, max_speed),
+        |p: &PosTime| calc_power_hueristic(p, &goal, &current, max_speed), // Hueristic is energy use at max speed - this will almost always be a pessimistic estimiate
         |p: &PosTime| p == &goal,
     )
 }
@@ -33,7 +33,7 @@ pub fn run_astar(goal: PosTime, current: Current, max_speed: f64) -> Option<(Vec
 fn find_successors(
     point: &PosTime,
     goal: &PosTime,
-    current: Current,
+    current: &Current,
     max_speed: f64,
 ) -> Vec<(PosTime, u32)> {
     // if we're at the end location but haven't hit the goal time, hold at location
@@ -70,8 +70,8 @@ fn find_successors(
             speeds.iter().filter_map(move |&speed| {
                 calculate_traversal_time(point, &next_point, current, speed).map(|addl_time| {
                     (
-                        PosTime(next_point.0, next_point.1, point.2 + addl_time),
-                        calc_traversal_power(addl_time, speed),
+                        PosTime(next_point.0, next_point.1, point.2 + addl_time), // next_point location and time
+                        calc_traversal_power(addl_time, speed), // cost to get to next_point
                     )
                 })
             })
@@ -82,7 +82,7 @@ fn find_successors(
 fn calc_power_hueristic(
     point: &PosTime,
     goal: &PosTime,
-    current: Current,
+    current: &Current,
     boat_water_speed: f64,
 ) -> u32 {
     match calculate_traversal_time(point, goal, current, boat_water_speed) {
@@ -102,7 +102,7 @@ fn calc_power_hueristic(
 fn calculate_traversal_time(
     point: &PosTime,
     goal: &PosTime,
-    current: Current,
+    current: &Current,
     boat_water_speed: f64,
 ) -> Option<u32> {
     // first calculate the distance and direction to the goal point
