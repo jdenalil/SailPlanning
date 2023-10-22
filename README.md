@@ -42,3 +42,4 @@ TODO
 1. Allow the energy function to be given as an input by the user instead of embedded in the code
 1. Allow the number of speeds tried to be given as an input by the user instead of embedded in the code
 1. Fix the hueristic function to ensure it is always lower then the actual cost
+1. Build out unit and integration tests
