@@ -1,9 +1,7 @@
 # SailPlanning
 path planning for efficient sailing 
 
-## Implementation Details: 
-
-### Problem Statement 
+## Problem Statement 
 We would like to arrive at some goal location at some time using the minimum power, given the following:
 1. Goal relative position and arrival time
 1. Magnitude and direction of ocean current
@@ -30,11 +28,9 @@ NOTE: for A* to be optimal, the hueristic must not be greater than the real cost
 #### Traversal Time function
 Both the hueristic and he transition functions leverage the function `calculate_traversal_time` under the hood, which I consider to be the core functionality of this approach. This function takes a current point, a goal point, an ocean current, and a desired boat water speed and calculates the amount of time it will take to traverse between the points using a newton's method solver. This time can be combined with the boat water speed and power map function to calculate the power used over the traversal.
 
-
 ### Why not other planning algorithms?
 1. dijkstra: For any non-trival planning, dijkstra takes a prohibative amount of time given that there is an equation solver to calculate the cost between two points. If we ignored ocean current, we would have a closed form solution for traversal time and dijkstra would be viable.
 2. rrt: TODO
-
 
 ## Future Work
 1. Build a low level planning to smooth the discretized waypoints and account for realistic vechicle dynamics
