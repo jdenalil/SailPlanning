@@ -15,6 +15,10 @@ pub struct Current {
 static SCALING_FACTOR: f64 = 1000.0;
 // number of speeds used to discretize speed range
 static NUM_SPEEDS_TO_SEARCH: u32 = 10;
+// scaling factor for hueristic
+// lower scaling factors lead to greedy best-first-search type behavior
+// higher scaling factors mean that A* is more likely to be optimal, but slower
+static HUERISTIC_SCALING_FACTOR: f64 = 1.0;
 
 type EnergyFunction = fn(f64) -> f64;
 
@@ -123,8 +127,11 @@ fn calc_power_hueristic(
     match calculate_traversal_time(point, goal, current, boat_water_speed) {
         Some(traversal_time) => {
             // return traversal power + hold power
-            calc_traversal_power(energy_use_fn, traversal_time, boat_water_speed)
-                + calc_hold_power(
+            // the traversal power is almost always an overestimate - scale it down so we don' miss best path
+            let unscaled_traversal_power: u32 = calc_traversal_power(energy_use_fn, traversal_time, boat_water_speed);
+            let scaled_traversal_power: u32 = (unscaled_traversal_power as f64 / HUERISTIC_SCALING_FACTOR) as u32;
+            // add in the hold power, which is always a perfect estimate
+            scaled_traversal_power + calc_hold_power(
                     energy_use_fn,
                     goal.2,
                     point.2 + traversal_time,

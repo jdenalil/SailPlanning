@@ -30,6 +30,7 @@ The heuristic used for the search is calculated by adding two components:
 2. The power used by holding at the goal location until the goal time for the remaining time
 
 NOTE: for A* to be optimal, the heuristic must not be greater than the real cost. This is not currently the case for most energy models.
+To mitigate this, I have an option to scale down the traversal power component of the hueristic by some constant value (the power used to hold at location is already a perfect estimate). This is a hand-tuned component, and making the value too high will result in the search runtime exploding, especially when the current is strong.
 
 ### Traversal Time function
 Both the heuristic and the transition functions leverage the function `calculate_traversal_time` under the hood, which I consider to be the core functionality of this approach. This function takes a current point, a goal point, an ocean current, and a desired boat water speed and calculates the amount of time it will take to traverse between the points using a newton's method solver. This time can be combined with the boat water speed and power map function to calculate the power used over the traversal.
